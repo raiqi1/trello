@@ -27,45 +27,52 @@ const ViewTask = () => {
         return {
           ...sub,
           isCompleted: !sub.isCompleted
-        }
-      }
-      else return { ...sub }
-    })
-    const task = {
-      ...viewTask.task, subtasks: newSubtasks,
-    };
-
-    let res = await fetch("api/task", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(task)
-    })
-    const newTask = await res.json();
-    console.log("Editing Task successful", { newTask });
-
-    const newBoards = boards.map((board) => {
-      if (board.id === boardSelectedId) {
-        const newTasks: Task[] = [];
-        const newColumns: IColumn[] = [];
-        board.columns.forEach((col) => {
-          if (col.id === newTask[0].columnId) {
-            col.tasks?.forEach((task) => {
-              if (task.id === newTask[0].id) {
-                newTasks.push(newTask[0]);
-              }
-              else newTasks.push(task)
-            })
-            newColumns.push({ ...col, tasks: newTasks })
-          }
-          else newColumns.push({ ...col })
-        })
-        return { ...board, columns: newColumns }
-      }
-      else return { ...board }
+        };
+      } else return { ...sub };
     });
-    setBoards(newBoards);
-    setViewTask({ ...viewTask, task: newTask[0] });
-  }
+  
+    const updatedTask: Task = {
+      ...viewTask.task!,
+      subtasks: newSubtasks,
+    };
+  
+    // Update local state first
+    setViewTask({ ...viewTask, task: updatedTask });
+  
+    try {
+      // Call the API
+      let res = await fetch("api/task", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedTask),
+      });
+  
+      const newTask: Task[] = await res.json();
+      console.log("Editing Task successful", { newTask });
+  
+      // Update state after API call
+      const newBoards = boards.map((board) => {
+        if (board.id === boardSelectedId) {
+          const newColumns = board.columns.map((col) => {
+            if (col.id === newTask[0].columnId) {
+              const updatedTasks = col.tasks?.map((task) => {
+                if (task.id === newTask[0].id) {
+                  return newTask[0];
+                } else return task;
+              });
+              return { ...col, tasks: updatedTasks };
+            } else return { ...col };
+          });
+          return { ...board, columns: newColumns };
+        } else return { ...board };
+      });
+      setBoards(newBoards);
+    } catch (error) {
+      console.error("Error editing task:", error);
+    }
+  };
+  
+  
 
   const editColumnTask = async (newColumnTask: IColumn) => {
     let task = {
