@@ -13,7 +13,7 @@ const AddTask = () => {
   useEffect(() => {
     setAddTaskInputs({ ...addTaskInputs, status: { value: completeBoardSelected?.columns[0].name ? completeBoardSelected?.columns[0].name : '', columnId: completeBoardSelected?.columns[0].id ? completeBoardSelected?.columns[0].id : '' } })
   }, [])
-  
+
   const createTask = async (status: { value: string, columnId: string }) => {
     const task = {
       title: addTaskInputs.title,

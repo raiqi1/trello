@@ -1,4 +1,5 @@
-import React from 'react'
+import React from 'react';
+import toast from 'react-hot-toast';
 import { useBoardStateContext } from '../context/Board';
 import { useHomeStateContext } from '../context/Home';
 import { useTaskStateContext } from '../context/Task';
@@ -143,12 +144,7 @@ const ViewTask = () => {
         <div className='w-full flex flex-col mt-4'>
           {
             viewTask.task?.subtasks?.map((subtask, index) => (
-              <div onClick={(e) => {
-                const target = e.target as Element;
-                if (!target.id.includes('inputCheckbox')) {
-                  editSubtask(index)
-                }
-              }} key={subtask.title} className="w-full min-h-[40px] flex items-center p-3 rounded bg-lightBg dark:bg-darkBg hover:bg-purple/25 hover:dark:bg-purple/25 cursor-pointer mb-2 last:mb-0">
+              <div onClick={() => editSubtask(index)} key={subtask.title} className="w-full min-h-[40px] flex items-center p-3 rounded bg-lightBg dark:bg-darkBg hover:bg-purple/25 hover:dark:bg-purple/25 cursor-pointer mb-2 last:mb-0">
                 <input id={`inputCheckbox-${index}`} checked={subtask.isCompleted} onClick={() => { }} onChange={() => { }} type="checkbox" className="min-w-4 w-4 h-4 text-purple cursor-pointer rounded outline-none focus:shadow-none focus:ring-0 mr-4" />
                 <label htmlFor={`inputCheckbox-${index}`} className={`w-[360px] text-hS ${subtask.isCompleted ? 'text-mediumGrey line-through' : 'dark:text-white'} font-bold cursor-pointer`}>{subtask.title}</label>
               </div>
@@ -185,4 +181,4 @@ const ViewTask = () => {
   )
 }
 
-export default ViewTask
+export default ViewTask;
